@@ -1,12 +1,9 @@
 import functools
-import requests
-import suds.transport as transport
+import io
 import traceback
 
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
+import requests
+import suds.transport as transport
 
 
 __all__ = ['RequestsTransport']
@@ -18,7 +15,7 @@ def handle_errors(f):
         try:
             return f(*args, **kwargs)
         except requests.HTTPError as e:
-            buf = StringIO.StringIO(e.response.content)
+            buf = io.BytesIO(e.response.content)
             raise transport.TransportError(
                 'Error in requests\n' + traceback.format_exc(),
                 e.response.status_code,
@@ -41,7 +38,7 @@ class RequestsTransport(transport.Transport):
     def open(self, request):
         resp = self._session.get(request.url)
         resp.raise_for_status()
-        return StringIO.StringIO(resp.content)
+        return io.BytesIO(resp.content)
 
     @handle_errors
     def send(self, request):
