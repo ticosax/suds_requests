@@ -14,7 +14,7 @@ def test_no_errors():
 
 def test_HTTPError():
     resp = mock.Mock(status_code=404,
-                     content='File not found')
+                     content=b'File not found')
     m = mock.Mock(
         side_effect=requests.HTTPError(response=resp),
         __name__='m',
@@ -23,7 +23,7 @@ def test_HTTPError():
     with pytest.raises(suds.transport.TransportError) as excinfo:
         f()
     assert excinfo.value.httpcode == 404
-    assert excinfo.value.fp.read() == 'File not found'
+    assert excinfo.value.fp.read() == b'File not found'
 
 
 def test_RequestException():
