@@ -42,6 +42,7 @@ def test_send():
             'A': 1,
             'B': 2,
         },
+        timeout=None,
     )
     assert reply.code == 200
     assert reply.headers == {

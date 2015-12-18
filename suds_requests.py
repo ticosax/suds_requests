@@ -30,13 +30,14 @@ def handle_errors(f):
 
 
 class RequestsTransport(transport.Transport):
-    def __init__(self, session=None):
+    def __init__(self, session=None, timeout=None):
         transport.Transport.__init__(self)
         self._session = session or requests.Session()
+        self.timeout = timeout
 
     @handle_errors
     def open(self, request):
-        resp = self._session.get(request.url)
+        resp = self._session.get(request.url, timeout=self.timeout)
         resp.raise_for_status()
         return io.BytesIO(resp.content)
 
@@ -46,6 +47,7 @@ class RequestsTransport(transport.Transport):
             request.url,
             data=request.message,
             headers=request.headers,
+            timeout=self.timeout,
         )
         if resp.headers.get('content-type') not in ('text/xml',
                                                     'application/soap+xml'):
